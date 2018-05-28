@@ -32,5 +32,5 @@ spec = describe "Murmur3" do
 
   describe "UTF-16 strings" do
     utf16 "Turn me into a hash" $ fromString "4138100590"
-    -- utf16 "✓ à la mode" $ fromInt 146308576
-    -- utf16 "💩💩💩" $ fromString "4037155920"
+    utf16 "✓ à la mode" $ fromInt 146308576
+    utf16 "💩💩💩" $ fromString "4037155920"

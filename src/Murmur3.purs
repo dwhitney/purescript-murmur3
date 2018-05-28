@@ -5,12 +5,11 @@ module Murmur3
 
 import Prelude hiding (zero, one)
 
-import Data.Array (foldl)
 import Data.BigInt (BigInt, and, fromBase, or, xor)
 import Data.BigInt as BigInt
-import Data.Char (toCharCode)
 import Data.Maybe (fromJust)
 import Data.String (toCharArray)
+import Murmur3.UTF8 (foldl)
 import Partial.Unsafe (unsafePartial)
 
 type HashData =
@@ -31,12 +30,11 @@ hashString :: BigInt -> String -> BigInt
 hashString seed str =
   str
     # toCharArray
-    >>> map (toCharCode >>> BigInt.fromInt)
-    >>> foldl hashFold { shift: 0.0, seed, hash: zero, charsProcessed: zero }
+    >>> foldl (BigInt.fromInt >>> hashFold) { shift: 0.0, seed, hash: zero, charsProcessed: zero }
     >>> finalize
 
-hashFold :: HashData -> BigInt -> HashData
-hashFold data_ c =
+hashFold :: BigInt -> HashData -> HashData
+hashFold c data_ =
   let
     res = c
       # shl data_.shift
@@ -73,19 +71,19 @@ finalize data_ =
     h1 = acc `xor` data_.charsProcessed
 
     h2 = h1
-      # shr 16.0 -- zshr
+      # zshr 16.0
       >>> xor h1
       >>> mur x85EBCA6B
 
     h3 = h2
-      # shr 13.0 -- zshr
+      # zshr 13.0
       >>> xor h2
       >>> mur xC2B2AE35
     in
       h3
-        # shr 16.0 -- zshr
+        # zshr 16.0
         >>> xor h3
-        >>> shr 0.0 -- zshr
+        >>> zshr 0.0
 
 mix :: BigInt -> BigInt -> BigInt
 mix h1 h2 =
@@ -94,23 +92,23 @@ mix h1 h2 =
   in
     k1
       # shl 15.0
-      >>> or (shr 17.0 k1) -- zshr
+      >>> or (zshr 17.0 k1)
       >>> mur x1B873593
       >>> xor h1
 
 
 mur :: BigInt -> BigInt -> BigInt
 mur c h =
-  and xFFFFFFFF ((and h xFFFF * c) + shl 16.0 (and xFFFF (shr 16.0 h * c))) -- zshr
+  and xFFFFFFFF ((and h xFFFF * c) + shl 16.0 (and xFFFF (zshr 16.0 h * c)))
 
 step :: BigInt -> BigInt
 step acc =
   let
     h1 = shl 13.0 acc
-      # or (shr 19.0 acc) -- zshr
+      # or (zshr 19.0 acc)
       >>> mur five
   in
-    (and h1 xFFFF + x6B64) + shl 16.0 (and xFFFF (shr 16.0 h1 + xE654)) -- zshr
+    (and h1 xFFFF + x6B64) + shl 16.0 (and xFFFF (zshr 16.0 h1 + xE654))
 
 shl :: Number -> BigInt -> BigInt
 shl = flip BigInt.shl
@@ -118,18 +116,21 @@ shl = flip BigInt.shl
 shr :: Number -> BigInt -> BigInt
 shr = flip BigInt.shr
 
+zshr :: Number -> BigInt -> BigInt
+zshr x n = shr x $ BigInt.abs n
+
 zero = BigInt.fromInt 0 :: BigInt
 one = BigInt.fromInt 1 :: BigInt
 five = BigInt.fromInt 5 :: BigInt
 
-x :: String -> BigInt
-x = unsafePartial $ fromJust <<< fromBase 16
+_x :: String -> BigInt
+_x = unsafePartial $ fromJust <<< fromBase 16
 
-x6B64 = x "6B64" :: BigInt
-xE654 = x "E654" :: BigInt
-xFFFF = x "FFFF" :: BigInt
-x1B873593 = x "1B873593" :: BigInt
-x85EBCA6B = x "85EBCA6B" :: BigInt
-xC2B2AE35 = x "C2B2AE35" :: BigInt
-xCC9E2D51 = x "CC9E2D51" :: BigInt
-xFFFFFFFF = x "FFFFFFFF" :: BigInt
+x6B64 = _x "6B64" :: BigInt
+xE654 = _x "E654" :: BigInt
+xFFFF = _x "FFFF" :: BigInt
+x1B873593 = _x "1B873593" :: BigInt
+x85EBCA6B = _x "85EBCA6B" :: BigInt
+xC2B2AE35 = _x "C2B2AE35" :: BigInt
+xCC9E2D51 = _x "CC9E2D51" :: BigInt
+xFFFFFFFF = _x "FFFFFFFF" :: BigInt
