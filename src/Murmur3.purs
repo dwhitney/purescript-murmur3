@@ -116,8 +116,11 @@ shl = flip BigInt.shl
 shr :: Number -> BigInt -> BigInt
 shr = flip BigInt.shr
 
+-- FIXME
+-- https://github.com/sharkdp/purescript-bigints/issues/21
+-- https://github.com/peterolson/BigInteger.js/issues/137
 zshr :: Number -> BigInt -> BigInt
-zshr x n = shr x $ BigInt.abs n
+zshr = shr
 
 zero = BigInt.fromInt 0 :: BigInt
 one = BigInt.fromInt 1 :: BigInt

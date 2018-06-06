@@ -9,7 +9,6 @@ import Data.Foldable as Foldable
 import Data.Int.Bits (and, or)
 import Data.Int.Bits as Int
 import Data.Maybe (Maybe(..))
-import Data.Ord (abs)
 import Data.Tuple (Tuple(..), fst)
 
 foldl :: forall a. (Int -> a -> a) -> a -> Array Char -> a
@@ -75,4 +74,4 @@ shr :: Int -> Int -> Int
 shr = flip Int.shr
 
 zshr :: Int -> Int -> Int
-zshr x n = shr x $ abs n
+zshr = flip Int.zshr
