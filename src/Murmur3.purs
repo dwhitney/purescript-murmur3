@@ -8,7 +8,7 @@ import Prelude hiding (zero, one)
 import Data.BigInt (BigInt, and, fromBase, or, xor)
 import Data.BigInt as BigInt
 import Data.Maybe (fromJust)
-import Data.String (toCharArray)
+import Data.String.CodeUnits (toCharArray)
 import Murmur3.UTF8 (foldl)
 import Partial.Unsafe (unsafePartial)
 

@@ -13,14 +13,14 @@ import Test.Spec.Assertions (shouldEqual)
 hashFn :: String -> BigInt
 hashFn = hashString $ fromInt 63476
 
-utf16 :: forall eff. String -> BigInt -> Spec eff Unit
+utf16 :: String -> BigInt -> Spec Unit
 utf16 input expected =
   it input $ expected `shouldEqual` hashString (fromInt 1234) input
 
 fromString :: String -> BigInt
 fromString = unsafePartial $ fromJust <<< BigInt.fromString
 
-spec :: forall r. Spec r Unit
+spec :: Spec Unit
 spec = describe "Murmur3" do
   describe "Hashing" do
     it "int" $ fromInt 1992578978 `shouldEqual` hashFn "-102433675"
